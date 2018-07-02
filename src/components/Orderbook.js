@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
-import * as d3 from 'd3';
-import drawOrderbook from '@melonproject/orderbook-visualisation';
+import ReactHighcharts from 'react-highcharts';
 
 class Orderbook extends Component {
 
@@ -18,22 +17,55 @@ class Orderbook extends Component {
     super();
 
     this.state = {
-      orderbooks: {}
+      config: {
+        chart: {
+          type: 'area'
+        },
+        title: {
+          text: 'Combined Order Book'
+        },
+        subtitle: {
+          // text: 'Source: Wikipedia.org'
+        },
+        xAxis: {
+          // tickmarkPlacement: 'on',
+          title: {
+            enabled: false
+          }
+        },
+        yAxis: {
+          title: {
+            // text: 'Billions'
+          },
+          labels: {
+            // formatter: function () {   return this.value / 1000; }
+          }
+        },
+        tooltip: {
+          split: true
+          // valueSuffix: ' millions'
+        },
+        plotOptions: {
+          area: {
+            stacking: 'normal',
+            lineColor: '#666666',
+            lineWidth: 1,
+            marker: {
+              lineWidth: 1,
+              lineColor: '#666666'
+            }
+          }
+        },
+        series: []
+      }
     };
 
-  }
-
-  componentDidMount() {
     this
       .exchanges
       .forEach(exchange => {
-        this
-          .getOrderbook(exchange)
-          .then(() => {
-            const svg = d3.select('svg.' + exchange.id);
-            drawOrderbook(this.state.orderbooks[exchange.id], svg, d3);
-          });
+        this.getOrderbook(exchange)
       });
+
   }
 
   async getOrderbook(_exchange) {
@@ -43,44 +75,39 @@ class Orderbook extends Component {
   }
 
   normalizeOrderbook(_exchangeId, _orderbook) {
-    this.restructureOrderbook(_exchangeId, _orderbook);
-    this.interpolateMissingPoints(_exchangeId);
-  }
-
-  restructureOrderbook(_exchangeId, _orderbook) {
-    let structuredOrderbook = [];
+    let tempData = [];
 
     switch (_exchangeId) {
       case 'bittrex':
         for (const type in _orderbook.result) {
           if (_orderbook.result.hasOwnProperty(type)) {
-            const cleanType = type === 'buy'
-              ? 'bid'
-              : 'ask';
             const orders = _orderbook.result[type];
             let runningTotal = 0;
             orders.forEach(order => {
-              let {Quantity: total, Rate: price} = order;
-              price = String(price);
-              runningTotal += total;
-              structuredOrderbook.push({type: cleanType, total: runningTotal, price});
+              let {Rate: x, Quantity: y} = order;
+              x = String(x);
+              runningTotal += y;
+              tempData.push([x, runningTotal]);
             });
+            if (type === 'buy') {
+              tempData.reverse();
+            }
           }
         }
         break;
       case 'poloniex':
         for (const type in _orderbook) {
           if (_orderbook.hasOwnProperty(type) && ['asks', 'bids'].includes(type)) {
-            const cleanType = type === 'bids'
-              ? 'bid'
-              : 'ask';
             const orders = _orderbook[type];
             let runningTotal = 0;
             orders.forEach(order => {
-              let {0: price, 1: total} = order;
-              runningTotal += total;
-              structuredOrderbook.push({type: cleanType, total: runningTotal, price});
+              let {0: x, 1: y} = order;
+              runningTotal += y;
+              tempData.push([x, runningTotal]);
             });
+            if (type === 'asks') {
+              tempData.reverse();
+            }
           }
         }
         break;
@@ -88,30 +115,30 @@ class Orderbook extends Component {
         console.error('An unknown exchange was provided; unable to deduce structure.');
         break;
     }
+    const series = {
+      name: _exchangeId,
+      data: tempData
+    };
 
-    this.setState({
-      orderbooks: {
-        ...this.state.orderbooks,
-        [_exchangeId]: structuredOrderbook
-      }
-    });
-  }
+    let config = this.state.config;
+    config['series'].push(series);
 
-  interpolateMissingPoints(_exchangeId) {
-    // Interpolate points that exist in another orderbook but not in this one
+    this.setState({config});
   }
 
   render() {
     return (
       <div className="row">
-        <div className="col-6" style={{paddingTop: 75}}>
-          <h3>Bittrex</h3>
-          <svg className="bittrex" style={{marginTop:50}}/>
+        <div className="col-12">
+          <h2>BTC/ETH</h2>
         </div>
-        <div className="col-6" style={{paddingTop: 75}}>
-          <h3>Poloniex</h3>
-          <svg className="poloniex" style={{marginTop:50}}/>
+        <div className="col-6">
+          <h3>Bids</h3>
         </div>
+        <div className="col-6">
+          <h3>Asks</h3>
+        </div>
+        <div className="col-12"><ReactHighcharts config={this.state.config}/></div>
       </div>
     );
   }
