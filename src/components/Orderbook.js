@@ -22,28 +22,18 @@ class Orderbook extends Component {
           type: 'area'
         },
         title: {
-          text: 'Combined Order Book'
-        },
-        subtitle: {
-          // text: 'Source: Wikipedia.org'
+          text: 'BTC/ETH'
         },
         xAxis: {
-          // tickmarkPlacement: 'on',
-          title: {
-            enabled: false
-          }
+          visible: false
         },
         yAxis: {
           title: {
-            // text: 'Billions'
-          },
-          labels: {
-            // formatter: function () {   return this.value / 1000; }
+            text: 'Order Volume (Total)'
           }
         },
         tooltip: {
           split: true
-          // valueSuffix: ' millions'
         },
         plotOptions: {
           area: {
@@ -130,7 +120,7 @@ class Orderbook extends Component {
     return (
       <div className="row">
         <div className="col-12">
-          <h2>BTC/ETH</h2>
+          <h2>Combined Order Book</h2>
         </div>
         <div className="col-6">
           <h3>Bids</h3>
