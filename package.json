@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@melonproject/orderbook-visualisation": "0.0.4",
+    "d3": "^4.13.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-highcharts": "^16.0.2",
