@@ -104,13 +104,13 @@ class Orderbook extends Component {
   render() {
     return (
       <div className="row">
-        <div className="col-6">
+        <div className="col-6" style={{paddingTop: 75}}>
           <h3>Bittrex</h3>
-          <svg className="bittrex"/>
+          <svg className="bittrex" style={{marginTop:50}}/>
         </div>
-        <div className="col-6">
+        <div className="col-6" style={{paddingTop: 75}}>
           <h3>Poloniex</h3>
-          <svg className="poloniex"/>
+          <svg className="poloniex" style={{marginTop:50}}/>
         </div>
       </div>
     );
