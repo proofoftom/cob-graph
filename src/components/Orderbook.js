@@ -128,7 +128,9 @@ class Orderbook extends Component {
         <div className="col-6">
           <h3>Asks</h3>
         </div>
-        <div className="col-12"><ReactHighcharts config={this.state.config}/></div>
+        <div className="col-12">
+          <ReactHighcharts config={this.state.config}/>
+        </div>
       </div>
     );
   }
