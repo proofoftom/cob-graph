@@ -6,7 +6,7 @@ import Orderbook from './components/Orderbook';
 class App extends Component {
   render() {
     return (
-      <div className="App">
+      <div className="App container mt-5">
         <Orderbook/>
       </div>
     );
